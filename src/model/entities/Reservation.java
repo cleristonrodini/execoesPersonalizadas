@@ -3,6 +3,7 @@ package model.entities;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import model.exception.DomainException;
 
 public class Reservation {
 
@@ -12,7 +13,10 @@ public class Reservation {
 	
 	private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 	
-	public Reservation(Integer roomNunber, Date checkIn, Date checkOut) {
+	public Reservation(Integer roomNunber, Date checkIn, Date checkOut) throws DomainException {
+		if (!checkOut.after(checkIn)) {
+			throw new DomainException("Data de saida tem que ser posterior a data de entrada!");
+		}
 		this.roomNunber = roomNunber;
 		this.checkIn = checkIn;
 		this.checkOut = checkOut;
@@ -40,17 +44,16 @@ public class Reservation {
 	}
 
 
-	public String updateDates(Date checkIn, Date checkOut) {
+	public void updateDates(Date checkIn, Date checkOut) throws DomainException {
 		Date now = new Date();
 		if (checkIn.before(now) || checkOut.before(now)) {
-			return "ERRO na atualização: As datas tem de ser datas futuras!";
+			throw new DomainException("ERRO na atualização: As datas tem de ser datas futuras!");
 		}else if (!checkOut.after(checkIn)) {
-			return "Data de saida tem que ser posterior a data de entrada!";
+			throw new DomainException("Data de saida tem que ser posterior a data de entrada!");
 		}
 		this.checkIn = checkIn;
 		this.checkOut = checkOut;
-		return null;
-	}
+		}
 	
 	@Override
 	public String toString() {
